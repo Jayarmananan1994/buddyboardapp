@@ -1,0 +1,136 @@
+import { createColdStartWrapper } from './apiService';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
+export const createTrip = async (tripData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/trips`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(tripData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error creating trip:', error);
+    throw error;
+  }
+};
+
+export const searchDestinations = async (query, includeCountries) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/destinations/search?q=${encodeURIComponent(query)}&includeCountries=${includeCountries}`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error searching destinations:', error);
+    throw error;
+  }
+};
+
+export const getTrips = async (filters = {}) => {
+  try {
+    const searchParams = new URLSearchParams();
+
+    // Add filters to search params
+    if (filters.destination) {
+      searchParams.append('destination', filters.destination);
+    }
+    if (filters.genderPreference) {
+      searchParams.append('genderPreference', filters.genderPreference);
+    }
+    if (filters.startDate) {
+      searchParams.append('startDate', filters.startDate);
+    }
+    if (filters.endDate) {
+      searchParams.append('endDate', filters.endDate);
+    }
+
+    const url = `${API_BASE_URL}/api/trips${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error fetching trips:', error);
+    throw error;
+  }
+};
+
+export const showInterest = async (tripId, interestData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/trips/${tripId}/interest`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(interestData),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      // Return error response with status for better error handling
+      throw {
+        status: response.status,
+        message: result.error || `HTTP error! status: ${response.status}`,
+        details: result
+      };
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error showing interest:', error);
+    throw error;
+  }
+};
+
+export const submitFeedback = async (feedbackData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/feedback`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(feedbackData),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw {
+        status: response.status,
+        message: result.error || `HTTP error! status: ${response.status}`,
+        details: result
+      };
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error submitting feedback:', error);
+    throw error;
+  }
+};
+
+// Wrapped versions with cold start handling for UI components
+export const createTripWithColdStart = createColdStartWrapper(createTrip, 'create trip');
+export const getTripsWithColdStart = createColdStartWrapper(getTrips, 'fetch trips');
+export const searchDestinationsWithColdStart = createColdStartWrapper(searchDestinations, 'search destinations');
+export const showInterestWithColdStart = createColdStartWrapper(showInterest, 'show interest');
+export const submitFeedbackWithColdStart = createColdStartWrapper(submitFeedback, 'submit feedback');

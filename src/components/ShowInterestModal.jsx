@@ -2,6 +2,10 @@ import { useState } from 'react';
 import { showInterestWithColdStart } from '../services/tripService';
 
 function ShowInterestModal({ trip, isOpen, onClose, onSuccess, onError }) {
+  // Don't render if trip data is not available
+  if (!trip || !isOpen) {
+    return null;
+  }
   const [formData, setFormData] = useState({
     name: '',
     contactMedium: 'whatsapp',
@@ -135,7 +139,6 @@ function ShowInterestModal({ trip, isOpen, onClose, onSuccess, onError }) {
     return selected?.placeholder || 'Your contact information';
   };
 
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -155,7 +158,11 @@ function ShowInterestModal({ trip, isOpen, onClose, onSuccess, onError }) {
             </button>
           </div>
           <p className="mt-2 text-sm text-gray-600">
-            Express your interest in traveling to <strong>{trip.destination?.name || trip.destination}</strong>
+            Express your interest in traveling to <strong>
+              {trip.destination?.name
+                ? (trip.destination.country ? `${trip.destination.name}, ${trip.destination.country.name}` : trip.destination.name)
+                : trip.destination || 'this destination'}
+            </strong>
           </p>
         </div>
 

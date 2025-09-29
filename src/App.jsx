@@ -2,11 +2,13 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import Layout from './components/Layout';
 import TripsPage from './pages/TripsPage';
 import CreateTripPage from './pages/CreateTripPage';
+import TripDetailPage from './pages/TripDetailPage';
 
 function AppContent() {
   const location = useLocation();
   const isTripsPage = location.pathname === '/' || location.pathname === '/trips';
   const isCreateTripPage = location.pathname === '/create-trip';
+  const isTripDetailPage = location.pathname.startsWith('/trip/');
 
   return (
     <Layout showCreateTripButton={isTripsPage}>
@@ -14,6 +16,7 @@ function AppContent() {
         <Route path="/" element={<TripsPage />} />
         <Route path="/trips" element={<TripsPage />} />
         <Route path="/create-trip" element={<CreateTripPage />} />
+        <Route path="/trip/:id" element={<TripDetailPage />} />
       </Routes>
     </Layout>
   );

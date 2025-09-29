@@ -101,6 +101,22 @@ export const showInterest = async (tripId, interestData) => {
   }
 };
 
+export const getTripById = async (tripId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/trips/${tripId}`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error fetching trip by ID:', error);
+    throw error;
+  }
+};
+
 export const submitFeedback = async (feedbackData) => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/feedback`, {
@@ -131,6 +147,7 @@ export const submitFeedback = async (feedbackData) => {
 // Wrapped versions with cold start handling for UI components
 export const createTripWithColdStart = createColdStartWrapper(createTrip, 'create trip');
 export const getTripsWithColdStart = createColdStartWrapper(getTrips, 'fetch trips');
+export const getTripByIdWithColdStart = createColdStartWrapper(getTripById, 'fetch trip details');
 export const searchDestinationsWithColdStart = createColdStartWrapper(searchDestinations, 'search destinations');
 export const showInterestWithColdStart = createColdStartWrapper(showInterest, 'show interest');
 export const submitFeedbackWithColdStart = createColdStartWrapper(submitFeedback, 'submit feedback');

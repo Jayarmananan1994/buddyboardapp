@@ -14,7 +14,8 @@ function TripCard({ trip }) {
   };
 
   const handleViewDetail = () => {
-    console.log('View detail clicked for:', trip.destination?.name || trip.destination);
+    // Navigate to trip detail page
+    window.location.href = `/trip/${trip.id}`;
   };
 
   const onContactClick = async (contactInfo) => {

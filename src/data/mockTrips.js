@@ -5,6 +5,7 @@ export const mockTrips = [
     dates: "Oct 15 - Oct 22",
     startingFrom: "London, UK",
     genderPref: "Female",
+    description: "Join me on an unforgettable journey to the City of Lights! I'm planning a backpacking trip to Paris and looking for travel buddies to explore the city with. I'm interested in visiting historical sites, trying local cuisine, and experiencing the nightlife. If you're interested in joining, let me know!",
     contact: {
       type: "telegram",
       value: "@janedoe",
@@ -18,6 +19,7 @@ export const mockTrips = [
     dates: "Nov 5 - Nov 15",
     startingFrom: "San Francisco, USA",
     genderPref: "Any",
+    description: "Seeking adventure buddies for an epic Tokyo exploration! I'm planning to experience the perfect blend of traditional and modern Japan. From visiting ancient temples to exploring vibrant neighborhoods like Shibuya and Harajuku, sampling incredible street food, and maybe even a day trip to Mount Fuji. Looking for fellow travelers who are excited about Japanese culture and don't mind a packed itinerary!",
     contact: {
       type: "whatsapp",
       value: "+1234567890",
@@ -31,6 +33,7 @@ export const mockTrips = [
     dates: "Dec 1 - Dec 10",
     startingFrom: "New York, USA",
     genderPref: "Male",
+    description: "Ready to dive deep into the Eternal City! I'm passionate about Roman history and architecture. Planning to explore the Colosseum, Vatican City, Roman Forum, and all the hidden gems. Also excited to indulge in authentic Italian cuisine and experience the vibrant Roman nightlife. Looking for a like-minded travel companion who appreciates history and great food!",
     contact: {
       type: "instagram",
       value: "@romeguy",
@@ -44,6 +47,7 @@ export const mockTrips = [
     dates: "Jan 10 - Jan 20",
     startingFrom: "Los Angeles, USA",
     genderPref: "Any",
+    description: "G'day! Planning an amazing Australian summer adventure in Sydney! I want to experience the iconic Opera House, climb the Harbour Bridge, relax at Bondi Beach, and explore the Blue Mountains. Also keen on discovering the local café culture and trying some Australian BBQ. Looking for an adventurous travel buddy who's up for both city exploration and outdoor activities!",
     contact: {
       type: "discord",
       value: "sydneysider#1234",
@@ -57,6 +61,7 @@ export const mockTrips = [
     dates: "Feb 5 - Feb 15",
     startingFrom: "Miami, USA",
     genderPref: "Any",
+    description: "Oi! Ready for the ultimate Brazilian carnival experience! I'm planning to visit during the perfect time to soak up the vibrant culture of Rio. Want to visit Christ the Redeemer, relax on Copacabana and Ipanema beaches, explore Santa Teresa neighborhood, and of course, experience the legendary nightlife. Looking for someone who loves music, dancing, and Brazilian culture!",
     contact: {
       type: "whatsapp",
       value: "rio.lover",
@@ -70,6 +75,7 @@ export const mockTrips = [
     dates: "Mar 1 - Mar 10",
     startingFrom: "Dubai, UAE",
     genderPref: "Female",
+    description: "Ahlan wa sahlan! Join me for an incredible journey through ancient Egypt! I'm fascinated by Egyptian history and can't wait to explore the Pyramids of Giza, the Sphinx, and the treasures of the Egyptian Museum. Also planning to cruise the Nile, visit local markets, and experience authentic Egyptian cuisine. Looking for a female travel companion who shares a passion for history and culture!",
     contact: {
       type: "email",
       value: "cairotravel@email.com",

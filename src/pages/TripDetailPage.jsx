@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { getTripByIdWithColdStart } from '../services/tripService';
+import { useParams, Link, useLocation } from 'react-router-dom';
+import { getTripByIdWithColdStart, getMyTripByIdWithColdStart } from '../services/tripService';
 import { handleContactClick } from '../utils/contactUtils';
 import { useToast } from '../hooks/useToast';
 import ToastContainer from '../components/ToastContainer';
@@ -9,11 +9,13 @@ import FloatingFeedbackButton from '../components/FloatingFeedbackButton';
 
 function TripDetailPage() {
   const { id } = useParams();
+  const location = useLocation();
   const [trip, setTrip] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [progressMessage, setProgressMessage] = useState('');
   const [isShowInterestModalOpen, setIsShowInterestModalOpen] = useState(false);
+  const [isOwnerView, setIsOwnerView] = useState(false);
   const { toasts, removeToast, showSuccess, showError } = useToast();
 
   const loadTrip = async (showLoading = true) => {
@@ -29,9 +31,18 @@ function TripDetailPage() {
     setError(null);
     setProgressMessage('');
 
+    // Determine if this is an owner view based on navigation source
+    const fromMyTrips = location.state?.fromMyTrips ||
+                       document.referrer.includes('/my-trips') ||
+                       sessionStorage.getItem(`trip-${id}-owner`) === 'true';
+
+    setIsOwnerView(fromMyTrips);
+
     try {
-      // Use cold start wrapper
-      await getTripByIdWithColdStart(
+      // Use appropriate API based on context
+      const apiCall = fromMyTrips ? getMyTripByIdWithColdStart : getTripByIdWithColdStart;
+
+      await apiCall(
         // Progress callback
         (message) => {
           if (showLoading) {
@@ -42,6 +53,10 @@ function TripDetailPage() {
         (response) => {
           if (response && response.success && response.trip) {
             setTrip(response.trip);
+            // Store owner context in session for future reference
+            if (fromMyTrips) {
+              sessionStorage.setItem(`trip-${id}-owner`, 'true');
+            }
           } else {
             setError('Trip not found');
           }
@@ -234,7 +249,12 @@ function TripDetailPage() {
       {/* Breadcrumb */}
       <div className="mb-6">
         <p className="text-sm text-slate-500">
-          <Link to="/trips" className="hover:text-primary transition-colors">Explore</Link>
+          <Link
+            to={isOwnerView ? "/my-trips" : "/trips"}
+            className="hover:text-primary transition-colors"
+          >
+            {isOwnerView ? "My Trips" : "Explore"}
+          </Link>
           <span className="mx-2">/</span>
           <span className="text-slate-800">Trip to {getDestinationName()}</span>
         </p>
@@ -253,12 +273,14 @@ function TripDetailPage() {
                 {trip.tripDetail || trip.description || 'Join me on an amazing travel adventure!'}
               </p>
             </div>
-            <button
-              onClick={handleShowInterest}
-              className="flex-shrink-0 w-full md:w-auto bg-primary text-white font-bold py-3 px-6 rounded-lg hover:bg-primary/90 transition-all duration-300 transform hover:scale-105"
-            >
-              I'm Interested
-            </button>
+            {trip.canShowInterest !== false && !isOwnerView && (
+              <button
+                onClick={handleShowInterest}
+                className="flex-shrink-0 w-full md:w-auto bg-primary text-white font-bold py-3 px-6 rounded-lg hover:bg-primary/90 transition-all duration-300 transform hover:scale-105"
+              >
+                I'm Interested
+              </button>
+            )}
           </div>
         </div>
 
@@ -320,7 +342,7 @@ function TripDetailPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
-                      {renderContactIcon(user.contactDetail)}
+                      {(isOwnerView || trip.isOwner) && user.contactDetail && renderContactIcon(user.contactDetail)}
                     </div>
                   </div>
                 </li>

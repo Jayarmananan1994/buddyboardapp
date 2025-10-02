@@ -1,4 +1,5 @@
 import { createColdStartWrapper } from './apiService';
+import { getToken } from './authService';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
@@ -144,6 +145,94 @@ export const submitFeedback = async (feedbackData) => {
   }
 };
 
+export const getMyTrips = async (limit = 20, offset = 0) => {
+  try {
+    const token = getToken();
+    const searchParams = new URLSearchParams();
+    searchParams.append('limit', limit.toString());
+    searchParams.append('offset', offset.toString());
+
+    const response = await fetch(`${API_BASE_URL}/api/trips/my-trips?${searchParams.toString()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw {
+        status: response.status,
+        message: result.error || `HTTP error! status: ${response.status}`,
+        details: result
+      };
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error fetching my trips:', error);
+    throw error;
+  }
+};
+
+export const getMyTripById = async (tripId) => {
+  try {
+    const token = getToken();
+    const response = await fetch(`${API_BASE_URL}/api/trips/my-trips/${tripId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw {
+        status: response.status,
+        message: result.error || `HTTP error! status: ${response.status}`,
+        details: result
+      };
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error fetching my trip by ID:', error);
+    throw error;
+  }
+};
+
+export const deleteTrip = async (tripId) => {
+  try {
+    const token = getToken();
+    const response = await fetch(`${API_BASE_URL}/api/trips/${tripId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw {
+        status: response.status,
+        message: result.error || `HTTP error! status: ${response.status}`,
+        details: result
+      };
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error deleting trip:', error);
+    throw error;
+  }
+};
+
 // Wrapped versions with cold start handling for UI components
 export const createTripWithColdStart = createColdStartWrapper(createTrip, 'create trip');
 export const getTripsWithColdStart = createColdStartWrapper(getTrips, 'fetch trips');
@@ -151,3 +240,6 @@ export const getTripByIdWithColdStart = createColdStartWrapper(getTripById, 'fet
 export const searchDestinationsWithColdStart = createColdStartWrapper(searchDestinations, 'search destinations');
 export const showInterestWithColdStart = createColdStartWrapper(showInterest, 'show interest');
 export const submitFeedbackWithColdStart = createColdStartWrapper(submitFeedback, 'submit feedback');
+export const getMyTripsWithColdStart = createColdStartWrapper(getMyTrips, 'fetch my trips');
+export const getMyTripByIdWithColdStart = createColdStartWrapper(getMyTripById, 'fetch my trip details');
+export const deleteTripWithColdStart = createColdStartWrapper(deleteTrip, 'delete trip');

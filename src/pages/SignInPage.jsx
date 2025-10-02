@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { signIn, signUp, saveToken, saveUser } from '../services/authService';
+import { signInWithWarmup, signUpWithWarmup, saveToken, saveUser } from '../services/authService';
 import { useToast } from '../hooks/useToast';
 import ToastContainer from '../components/ToastContainer';
 
@@ -77,7 +77,7 @@ function SignInPage() {
     try {
       if (isSignUpMode) {
         // Sign up
-        const response = await signUp({
+        const response = await signUpWithWarmup({
           username: formData.username.trim(),
           pin: formData.pin
         });
@@ -96,7 +96,7 @@ function SignInPage() {
         }
       } else {
         // Sign in
-        const response = await signIn({
+        const response = await signInWithWarmup({
           username: formData.username.trim(),
           pin: formData.pin
         });

@@ -1,4 +1,4 @@
-import { createColdStartWrapper } from './apiService';
+import { createColdStartWrapper } from './apiUtils';
 import { getToken } from './authService';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';

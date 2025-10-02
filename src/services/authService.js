@@ -1,3 +1,5 @@
+import { createSimpleApiWrapper, createApiWrapper } from './apiUtils';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 export const signUp = async (userData) => {
@@ -90,3 +92,16 @@ export const logout = () => {
 export const isAuthenticated = () => {
   return !!getToken();
 };
+
+// Wrapped versions with server warm-up support
+export const signUpWithWarmup = createSimpleApiWrapper(signUp, {
+  operationName: 'sign up'
+});
+
+export const signInWithWarmup = createSimpleApiWrapper(signIn, {
+  operationName: 'sign in'
+});
+
+// Callback-style wrappers for UI components that need progress feedback
+export const signUpWithProgress = createApiWrapper(signUp, 'sign up');
+export const signInWithProgress = createApiWrapper(signIn, 'sign in');

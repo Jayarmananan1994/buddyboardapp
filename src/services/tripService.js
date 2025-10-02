@@ -5,11 +5,19 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000
 
 export const createTrip = async (tripData) => {
   try {
+    const token = getToken();
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    // Only include Authorization header if user is signed in
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_BASE_URL}/api/trips`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(tripData),
     });
 

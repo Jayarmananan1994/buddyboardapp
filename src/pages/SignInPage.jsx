@@ -147,7 +147,7 @@ function SignInPage() {
   };
 
   const handleContinueWithoutSignIn = () => {
-    navigate('/');
+    navigate('/trips');
   };
 
   return (

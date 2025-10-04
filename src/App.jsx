@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import TripsPage from './pages/TripsPage';
 import CreateTripPage from './pages/CreateTripPage';
@@ -21,12 +21,6 @@ function AuthRoute({ children }) {
 }
 
 function AppContent() {
-  const location = useLocation();
-  const isTripsPage = location.pathname === '/' || location.pathname === '/trips';
-  const isCreateTripPage = location.pathname === '/create-trip';
-  const isTripDetailPage = location.pathname.startsWith('/trip/');
-  const isSignInPage = location.pathname === '/signin';
-
   return (
     <Routes>
       {/* Auth Routes - no layout */}
@@ -43,35 +37,37 @@ function AppContent() {
         element={<ResetPinPage />}
       />
 
-      {/* Protected Routes - with layout */}
+      {/* Public Routes - with layout */}
       <Route
         path="/"
-        element={
-          <ProtectedRoute>
-            <Navigate to="/trips" replace />
-          </ProtectedRoute>
-        }
+        element={<Navigate to="/trips" replace />}
       />
       <Route
         path="/trips"
         element={
-          <ProtectedRoute>
-            <Layout>
-              <TripsPage />
-            </Layout>
-          </ProtectedRoute>
+          <Layout>
+            <TripsPage />
+          </Layout>
         }
       />
       <Route
         path="/create-trip"
         element={
-          <ProtectedRoute>
-            <Layout>
-              <CreateTripPage />
-            </Layout>
-          </ProtectedRoute>
+          <Layout>
+            <CreateTripPage />
+          </Layout>
         }
       />
+      <Route
+        path="/trip/:id"
+        element={
+          <Layout>
+            <TripDetailPage />
+          </Layout>
+        }
+      />
+
+      {/* Protected Routes - with layout */}
       <Route
         path="/my-trips"
         element={
@@ -82,23 +78,11 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/trip/:id"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <TripDetailPage />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
 
-      {/* Fallback - redirect to signin for unauthenticated, trips for authenticated */}
+      {/* Fallback - redirect to trips */}
       <Route
         path="*"
-        element={
-          isAuthenticated() ? <Navigate to="/trips" replace /> : <Navigate to="/signin" replace />
-        }
+        element={<Navigate to="/trips" replace />}
       />
     </Routes>
   );

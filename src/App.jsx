@@ -4,6 +4,7 @@ import TripsPage from './pages/TripsPage';
 import CreateTripPage from './pages/CreateTripPage';
 import TripDetailPage from './pages/TripDetailPage';
 import SignInPage from './pages/SignInPage';
+import ResetPinPage from './pages/ResetPinPage';
 import MyTripsPage from './pages/MyTripsPage';
 import { isAuthenticated } from './services/authService';
 
@@ -36,6 +37,10 @@ function AppContent() {
             <SignInPage />
           </AuthRoute>
         }
+      />
+      <Route
+        path="/reset-pin"
+        element={<ResetPinPage />}
       />
 
       {/* Protected Routes - with layout */}

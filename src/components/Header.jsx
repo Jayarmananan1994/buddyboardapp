@@ -126,6 +126,12 @@ function Header() {
               >
                 My Trips
               </Link>
+              <Link
+                to="/reset-pin"
+                className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                Reset PIN
+              </Link>
               <hr className="my-2 border-slate-200" />
               <button
                 onClick={handleLogout}

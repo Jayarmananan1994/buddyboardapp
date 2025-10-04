@@ -58,6 +58,42 @@ export const signIn = async (credentials) => {
   }
 };
 
+export const resetPin = async (resetData) => {
+  try {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    // If user is authenticated, add Bearer token
+    const token = getToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/auth/reset-pin`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(resetData),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      // Return error response with status for better error handling
+      throw {
+        status: response.status,
+        message: result.message || result.error || `HTTP error! status: ${response.status}`,
+        details: result
+      };
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error during PIN reset:', error);
+    throw error;
+  }
+};
+
 // Token management functions
 export const saveToken = (token) => {
   localStorage.setItem('authToken', token);
@@ -102,6 +138,11 @@ export const signInWithWarmup = createSimpleApiWrapper(signIn, {
   operationName: 'sign in'
 });
 
+export const resetPinWithWarmup = createSimpleApiWrapper(resetPin, {
+  operationName: 'reset PIN'
+});
+
 // Callback-style wrappers for UI components that need progress feedback
 export const signUpWithProgress = createApiWrapper(signUp, 'sign up');
 export const signInWithProgress = createApiWrapper(signIn, 'sign in');
+export const resetPinWithProgress = createApiWrapper(resetPin, 'reset PIN');

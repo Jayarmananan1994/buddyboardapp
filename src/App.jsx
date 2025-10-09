@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import UmamiAnalytics from '@danielgtmn/umami-react';
 import Layout from './components/Layout';
 import TripsPage from './pages/TripsPage';
 import CreateTripPage from './pages/CreateTripPage';
@@ -89,8 +90,18 @@ function AppContent() {
 }
 
 function App() {
+  const websiteId = import.meta.env.VITE_UMAMI_WEBSITE_ID;
+  const umamiSrc = import.meta.env.VITE_UMAMI_SRC;
+
   return (
     <Router>
+      {/* Umami Analytics - Only load if website ID is configured */}
+      {websiteId && websiteId !== 'your-website-id-here' && (
+        <UmamiAnalytics
+          websiteId={websiteId}
+          src={umamiSrc || 'https://cloud.umami.is/script.js'}
+        />
+      )}
       <AppContent />
     </Router>
   );

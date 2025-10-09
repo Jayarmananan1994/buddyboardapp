@@ -99,7 +99,8 @@ function App() {
       {websiteId && websiteId !== 'your-website-id-here' && (
         <UmamiAnalytics
           websiteId={websiteId}
-          src={umamiSrc || 'https://cloud.umami.is/script.js'}
+          url={umamiSrc || 'https://cloud.umami.is'}
+          onlyInProduction = {false}
         />
       )}
       <AppContent />

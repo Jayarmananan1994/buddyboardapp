@@ -1,21 +1,31 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMyTripsWithColdStart, deleteTripWithColdStart } from '../services/tripService';
+import { isAuthenticated } from '../services/authService';
 import { useToast } from '../hooks/useToast';
 import ToastContainer from '../components/ToastContainer';
 import ConfirmationDialog from '../components/ConfirmationDialog';
+import SignInPrompt from '../components/SignInPrompt';
 
 function MyTripsPage() {
   const navigate = useNavigate();
+  const userIsAuthenticated = isAuthenticated();
   const { toasts, removeToast, showSuccess, showError } = useToast();
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [progressMessage, setProgressMessage] = useState('');
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, tripId: null, tripDestination: '' });
+  const hasFetchedData = useRef(false);
 
   useEffect(() => {
-    fetchMyTrips();
-  }, []);
+    // Only fetch if authenticated and haven't fetched yet
+    if (userIsAuthenticated && !hasFetchedData.current) {
+      fetchMyTrips();
+      hasFetchedData.current = true;
+    } else if (!userIsAuthenticated) {
+      setLoading(false);
+    }
+  }, [userIsAuthenticated]);
 
   const fetchMyTrips = async () => {
     try {
@@ -185,6 +195,22 @@ function MyTripsPage() {
           </div>
         </div>
       </div>
+    );
+  }
+
+  // If not authenticated, show sign-in prompt
+  if (!userIsAuthenticated) {
+    return (
+      <>
+        <SignInPrompt
+          icon="luggage"
+          title="🧳 You haven't signed in yet"
+          message="Sign in to view or manage your trips easily."
+          subtitle="Trips posted anonymously can't be edited or deleted."
+        />
+        {/* Toast Notifications */}
+        <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
+      </>
     );
   }
 

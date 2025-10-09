@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import FilterBar from '../components/FilterBar';
 import TripGrid from '../components/TripGrid';
 import FloatingFeedbackButton from '../components/FloatingFeedbackButton';
@@ -6,6 +6,7 @@ import { getTripsWithColdStart } from '../services/tripService';
 import { mockTrips } from '../data/mockTrips';
 import { useToast } from '../hooks/useToast';
 import ToastContainer from '../components/ToastContainer';
+import { useTrips } from '../contexts/TripsContext';
 
 function TripsPage() {
   const [trips, setTrips] = useState([]);
@@ -15,9 +16,14 @@ function TripsPage() {
   const [appliedFilters, setAppliedFilters] = useState({});
   const [progressMessage, setProgressMessage] = useState('');
   const { toasts, removeToast, showSuccess, showError } = useToast();
+  const hasFetchedData = useRef(false);
 
   // Load trips with filters
-  const loadTrips = async (filters = {}) => {
+  const loadTrips = async (filters = {}, forceRefetch = false) => {
+    // Skip if already loaded and not forcing refetch
+    if (hasFetchedData.current && !forceRefetch && Object.keys(filters).length === 0) {
+      return;
+    }
     setIsLoading(true);
     setError(null);
     setProgressMessage('');
@@ -63,17 +69,20 @@ function TripsPage() {
     } finally {
       setIsLoading(false);
       setProgressMessage('');
+      hasFetchedData.current = true;
     }
   };
 
   // Load trips on component mount
   useEffect(() => {
-    loadTrips();
+    if (!hasFetchedData.current) {
+      loadTrips();
+    }
   }, []);
 
   // Handle filter changes (memoized to prevent unnecessary re-renders)
   const handleFiltersChange = useCallback((filters) => {
-    loadTrips(filters);
+    loadTrips(filters, true); // Force refetch when filters change
   }, []);
 
   return (

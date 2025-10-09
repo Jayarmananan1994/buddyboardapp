@@ -8,6 +8,7 @@ import SignInPage from './pages/SignInPage';
 import ResetPinPage from './pages/ResetPinPage';
 import MyTripsPage from './pages/MyTripsPage';
 import { isAuthenticated } from './services/authService';
+import { TripsProvider } from './contexts/TripsContext';
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -94,16 +95,18 @@ function App() {
   const umamiSrc = import.meta.env.VITE_UMAMI_SRC;
 
   return (
-    <Router>
-      {/* Umami Analytics - Only load if website ID is configured */}
-      {websiteId && websiteId !== 'your-website-id-here' && (
-        <UmamiAnalytics
-          websiteId={websiteId}
-          url={umamiSrc || 'https://cloud.umami.is'}
-        />
-      )}
-      <AppContent />
-    </Router>
+    <TripsProvider>
+      <Router>
+        {/* Umami Analytics - Only load if website ID is configured */}
+        {websiteId && websiteId !== 'your-website-id-here' && (
+          <UmamiAnalytics
+            websiteId={websiteId}
+            url={umamiSrc || 'https://cloud.umami.is'}
+          />
+        )}
+        <AppContent />
+      </Router>
+    </TripsProvider>
   );
 }
 

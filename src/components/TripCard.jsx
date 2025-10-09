@@ -111,10 +111,15 @@ function TripCard({ trip }) {
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-lg">
       {/* Trip Image or Placeholder */}
-      {trip.image ? (
+      {trip.imageUrl ? (
         <div
           className="relative h-48 w-full bg-cover bg-center"
-          style={{ backgroundImage: `url("${trip.image}")` }}
+          style={{ backgroundImage: `url("${trip.imageUrl}")` }}
+          onError={(e) => {
+            // Fallback to placeholder if image fails to load
+            e.target.style.backgroundImage = 'none';
+            e.target.classList.add('bg-slate-200');
+          }}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
           <div className="absolute bottom-0 left-0 p-4">
@@ -124,7 +129,7 @@ function TripCard({ trip }) {
         </div>
       ) : (
         <div className="relative h-48 w-full bg-slate-200 flex items-center justify-center">
-          <span className="material-symbols-outlined text-4xl text-slate-400">image_not_supported</span>
+          <span className="material-symbols-outlined text-4xl text-slate-400">travel_explore</span>
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
           <div className="absolute bottom-0 left-0 p-4">
             <h3 className="text-xl font-bold text-white">{getDestinationName()}</h3>

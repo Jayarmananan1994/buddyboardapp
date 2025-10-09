@@ -262,13 +262,37 @@ function TripDetailPage() {
 
       {/* Trip Detail Card */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-slate-200">
+        {/* Hero Image */}
+        {trip.imageUrl ? (
+          <div
+            className="relative h-64 md:h-80 w-full bg-cover bg-center"
+            style={{ backgroundImage: `url("${trip.imageUrl}")` }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white mb-2">
+                Trip to {getDestinationName()}
+              </h1>
+              <p className="text-slate-100 text-sm md:text-base">
+                {formatDateRange()}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="relative h-64 md:h-80 w-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+            <span className="material-symbols-outlined text-6xl text-primary/30">travel_explore</span>
+          </div>
+        )}
+
         {/* Header */}
         <div className="p-6 md:p-8">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <div className="flex-1">
-              <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-                Trip to {getDestinationName()}
-              </h1>
+              {!trip.imageUrl && (
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+                  Trip to {getDestinationName()}
+                </h1>
+              )}
               <p className="mt-2 text-slate-600">
                 {trip.tripDetail || trip.description || 'Join me on an amazing travel adventure!'}
               </p>

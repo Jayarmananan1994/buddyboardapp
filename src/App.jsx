@@ -100,7 +100,6 @@ function App() {
         <UmamiAnalytics
           websiteId={websiteId}
           url={umamiSrc || 'https://cloud.umami.is'}
-          onlyInProduction = {false}
         />
       )}
       <AppContent />

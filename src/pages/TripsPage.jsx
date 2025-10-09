@@ -137,7 +137,7 @@ function TripsPage() {
       <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
 
       {/* Floating Feedback Button */}
-      <FloatingFeedbackButton />
+      {/* <FloatingFeedbackButton /> */}
     </>
   );
 }

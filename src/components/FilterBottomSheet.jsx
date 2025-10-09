@@ -129,12 +129,12 @@ function FilterBottomSheet({ isOpen, onClose, onApplyFilters, initialFilters = {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
+        className="fixed inset-0 bg-black/50 z-[60] transition-opacity duration-300"
         onClick={handleBackdropClick}
       />
 
       {/* Bottom Sheet */}
-      <div className="fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-2xl shadow-2xl max-h-[85vh] flex flex-col animate-slide-up">
+      <div className="fixed inset-x-0 bottom-0 z-[70] bg-white rounded-t-2xl shadow-2xl max-h-[85vh] flex flex-col animate-slide-up">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-200">
           <h3 className="text-lg font-bold text-slate-900">Filters</h3>

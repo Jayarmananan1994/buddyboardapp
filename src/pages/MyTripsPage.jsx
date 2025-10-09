@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMyTripsWithColdStart, deleteTripWithColdStart } from '../services/tripService';
 import { isAuthenticated } from '../services/authService';
@@ -6,23 +6,23 @@ import { useToast } from '../hooks/useToast';
 import ToastContainer from '../components/ToastContainer';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import SignInPrompt from '../components/SignInPrompt';
+import { useTrips } from '../contexts/TripsContext';
 
 function MyTripsPage() {
   const navigate = useNavigate();
   const userIsAuthenticated = isAuthenticated();
   const { toasts, removeToast, showSuccess, showError } = useToast();
-  const [trips, setTrips] = useState([]);
+  const { myTrips, setMyTrips, hasFetchedMyTrips, setHasFetchedMyTrips, refreshTrips } = useTrips();
   const [loading, setLoading] = useState(true);
   const [progressMessage, setProgressMessage] = useState('');
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, tripId: null, tripDestination: '' });
-  const hasFetchedData = useRef(false);
 
   useEffect(() => {
     // Only fetch if authenticated and haven't fetched yet
-    if (userIsAuthenticated && !hasFetchedData.current) {
+    if (userIsAuthenticated && !hasFetchedMyTrips) {
       fetchMyTrips();
-      hasFetchedData.current = true;
-    } else if (!userIsAuthenticated) {
+    } else {
+      // If not authenticated OR already fetched, stop loading
       setLoading(false);
     }
   }, [userIsAuthenticated]);
@@ -32,7 +32,7 @@ function MyTripsPage() {
       setLoading(true);
       setProgressMessage('');
 
-      const response = await getMyTripsWithColdStart(
+      await getMyTripsWithColdStart(
         // Progress callback
         (message) => {
           setProgressMessage(message);
@@ -40,7 +40,8 @@ function MyTripsPage() {
         // Success callback
         (data) => {
           if (data.success) {
-            setTrips(data.trips || []);
+            setMyTrips(data.trips || []);
+            setHasFetchedMyTrips(true);
           }
         },
         // Error callback
@@ -94,7 +95,7 @@ function MyTripsPage() {
     try {
       await deleteTripWithColdStart(
         // Progress callback
-        (message) => {
+        () => {
           // Could show progress in UI if needed
         },
         // Success callback
@@ -102,7 +103,9 @@ function MyTripsPage() {
           if (data.success) {
             showSuccess('Trip deleted successfully!');
             // Remove from local state
-            setTrips(prev => prev.filter(trip => trip.id !== tripId));
+            setMyTrips(prev => prev.filter(trip => trip.id !== tripId));
+            // Refresh trips page data since a trip was deleted
+            refreshTrips();
           }
         },
         // Error callback
@@ -219,7 +222,7 @@ function MyTripsPage() {
       <div className="w-full max-w-4xl">
         <h2 className="px-4 text-3xl font-bold text-slate-900">My Trips</h2>
 
-        {trips.length === 0 ? (
+        {myTrips.length === 0 ? (
           <div className="mt-8 text-center py-12">
             <div className="mx-auto w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-4">
               <span className="material-symbols-outlined text-4xl text-slate-400">travel_explore</span>
@@ -238,7 +241,7 @@ function MyTripsPage() {
           </div>
         ) : (
           <div className="mt-8 space-y-8">
-            {trips.map((trip) => (
+            {myTrips.map((trip) => (
               <div
                 key={trip.id}
                 className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6"

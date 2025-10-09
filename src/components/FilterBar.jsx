@@ -49,6 +49,12 @@ function FilterBar({ onFiltersChange }) {
     const currentFiltersString = JSON.stringify(currentFilters);
     const previousFiltersString = JSON.stringify(previousFiltersRef.current);
 
+    // Skip on initial mount (when previousFiltersRef is null)
+    if (previousFiltersRef.current === null) {
+      previousFiltersRef.current = currentFilters;
+      return;
+    }
+
     // Only call onFiltersChange if filters actually changed
     if (onFiltersChange && currentFiltersString !== previousFiltersString) {
       previousFiltersRef.current = currentFilters;

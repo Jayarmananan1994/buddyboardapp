@@ -8,6 +8,22 @@ export function TripsProvider({ children }) {
   const [hasFetchedTrips, setHasFetchedTrips] = useState(false);
   const [hasFetchedMyTrips, setHasFetchedMyTrips] = useState(false);
 
+  // Function to refresh trips data
+  const refreshTrips = () => {
+    setHasFetchedTrips(false);
+  };
+
+  // Function to refresh my trips data
+  const refreshMyTrips = () => {
+    setHasFetchedMyTrips(false);
+  };
+
+  // Function to refresh all data
+  const refreshAll = () => {
+    setHasFetchedTrips(false);
+    setHasFetchedMyTrips(false);
+  };
+
   const value = {
     trips,
     setTrips,
@@ -17,6 +33,9 @@ export function TripsProvider({ children }) {
     setHasFetchedTrips,
     hasFetchedMyTrips,
     setHasFetchedMyTrips,
+    refreshTrips,
+    refreshMyTrips,
+    refreshAll,
   };
 
   return <TripsContext.Provider value={value}>{children}</TripsContext.Provider>;

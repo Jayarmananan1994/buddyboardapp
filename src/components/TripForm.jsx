@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { createTrip } from '../services/tripService';
 import AutocompleteInput from './AutocompleteInput';
+import { useTrips } from '../contexts/TripsContext';
 
 function TripForm() {
+  const { refreshAll } = useTrips();
   const [formData, setFormData] = useState({
     destination: null,
     fromLocation: null,
@@ -109,6 +111,9 @@ function TripForm() {
       if (response.success) {
         setCreatedTrip(response.trip);
         setShowSuccessDialog(true);
+
+        // Refresh trips and my trips data
+        refreshAll();
 
         // Reset form
         setFormData({

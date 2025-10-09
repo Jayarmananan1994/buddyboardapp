@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import FilterBar from '../components/FilterBar';
 import TripGrid from '../components/TripGrid';
 import FloatingFeedbackButton from '../components/FloatingFeedbackButton';
@@ -9,15 +9,13 @@ import ToastContainer from '../components/ToastContainer';
 import { useTrips } from '../contexts/TripsContext';
 
 function TripsPage() {
-  const [trips, setTrips] = useState([]);
+  const { trips, setTrips, hasFetchedTrips, setHasFetchedTrips } = useTrips();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState(null);
   const [appliedFilters, setAppliedFilters] = useState({});
   const [progressMessage, setProgressMessage] = useState('');
   const { toasts, removeToast, showSuccess, showError } = useToast();
-  //const hasFetchedData = useRef(false);
-  const { hasFetchedTrips, setHasFetchedTrips } = useTrips();
 
   // Load trips with filters
   const loadTrips = async (filters = {}, forceRefetch = false) => {

@@ -16,12 +16,13 @@ function TripsPage() {
   const [appliedFilters, setAppliedFilters] = useState({});
   const [progressMessage, setProgressMessage] = useState('');
   const { toasts, removeToast, showSuccess, showError } = useToast();
-  const hasFetchedData = useRef(false);
+  //const hasFetchedData = useRef(false);
+  const { hasFetchedTrips, setHasFetchedTrips } = useTrips();
 
   // Load trips with filters
   const loadTrips = async (filters = {}, forceRefetch = false) => {
     // Skip if already loaded and not forcing refetch
-    if (hasFetchedData.current && !forceRefetch && Object.keys(filters).length === 0) {
+    if (hasFetchedTrips && !forceRefetch && Object.keys(filters).length === 0) {
       return;
     }
     setIsLoading(true);
@@ -42,6 +43,7 @@ function TripsPage() {
             setTrips(response.trips || []);
             setPagination(response.pagination || null);
             setAppliedFilters(response.filters || {});
+            setHasFetchedTrips(true);
           } else {
             // If response doesn't have success flag, try to handle as direct array
             const tripsData = response.trips || response || [];
@@ -69,19 +71,23 @@ function TripsPage() {
     } finally {
       setIsLoading(false);
       setProgressMessage('');
-      hasFetchedData.current = true;
+      setHasFetchedTrips(true);
+      //hasFetchedData.current = true;
     }
   };
 
   // Load trips on component mount
   useEffect(() => {
-    if (!hasFetchedData.current) {
+    console.log('TripsPage mounted, hasFetchedTrips:', hasFetchedTrips);
+    if (!hasFetchedTrips) {
+      console.log('Fetching trips for the first time...');
       loadTrips();
     }
   }, []);
 
   // Handle filter changes (memoized to prevent unnecessary re-renders)
   const handleFiltersChange = useCallback((filters) => {
+    console.log('Filters changed:', filters);
     loadTrips(filters, true); // Force refetch when filters change
   }, []);
 

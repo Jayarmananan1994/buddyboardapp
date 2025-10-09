@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { searchDestinations } from '../services/tripService';
+import FilterBottomSheet from './FilterBottomSheet';
 
 function FilterBar({ onFiltersChange }) {
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [destinationInput, setDestinationInput] = useState('');
   const [selectedDestination, setSelectedDestination] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -117,6 +119,41 @@ function FilterBar({ onFiltersChange }) {
            (genderPreference && genderPreference !== 'all');
   };
 
+  // Count active filters
+  const getActiveFilterCount = () => {
+    let count = 0;
+    if (selectedDestination) count++;
+    if (dateRange.start && dateRange.end) count++;
+    if (genderPreference && genderPreference !== 'all') count++;
+    return count;
+  };
+
+  // Handle bottom sheet filter apply
+  const handleBottomSheetApply = (filters) => {
+    // Update state from bottom sheet filters
+    if (filters.destination) {
+      setSelectedDestination({ id: filters.destination, name: filters.destinationName });
+      setDestinationInput(filters.destinationName || '');
+    } else {
+      setSelectedDestination(null);
+      setDestinationInput('');
+    }
+
+    if (filters.startDate && filters.endDate) {
+      setDateRange({ start: filters.startDate, end: filters.endDate });
+      setTempDateRange({ start: filters.startDate, end: filters.endDate });
+    } else {
+      setDateRange({ start: '', end: '' });
+      setTempDateRange({ start: '', end: '' });
+    }
+
+    if (filters.genderPreference) {
+      setGenderPreference(filters.genderPreference);
+    } else {
+      setGenderPreference('');
+    }
+  };
+
   const handleSuggestionClick = (suggestion) => {
     setDestinationInput(suggestion.name);
     setSelectedDestination(suggestion);
@@ -164,10 +201,79 @@ function FilterBar({ onFiltersChange }) {
 
   // Remove the filtered suggestions logic since we're using API results directly
 
+  const activeFilterCount = getActiveFilterCount();
+
   return (
-    <div className="mb-6 flex flex-wrap items-center gap-4 rounded-lg border border-slate-200 bg-background-light p-4">
-      <h3 className="text-lg font-semibold text-slate-800">Filter by:</h3>
-      <div className="flex flex-wrap gap-3 items-center">
+    <>
+      {/* Mobile View - Filter Button Only */}
+      <div className="md:hidden mb-6">
+        {/* Filter Button */}
+        <button
+          onClick={() => setIsBottomSheetOpen(true)}
+          className="relative w-full flex items-center justify-center gap-2 py-3 px-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium"
+        >
+          <span className="material-symbols-outlined">tune</span>
+          <span>Filters</span>
+          {activeFilterCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
+
+        {/* Active Filters Summary */}
+        {hasActiveFilters() && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {selectedDestination && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
+                <span className="material-symbols-outlined text-sm">location_on</span>
+                {selectedDestination.name}
+                <button
+                  onClick={() => {
+                    setSelectedDestination(null);
+                    setDestinationInput('');
+                  }}
+                  className="ml-1 hover:bg-primary/20 rounded-full p-0.5"
+                >
+                  <span className="material-symbols-outlined text-sm">close</span>
+                </button>
+              </span>
+            )}
+            {dateRange.start && dateRange.end && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
+                <span className="material-symbols-outlined text-sm">date_range</span>
+                {formatDateRange()}
+                <button
+                  onClick={() => {
+                    setDateRange({ start: '', end: '' });
+                    setTempDateRange({ start: '', end: '' });
+                  }}
+                  className="ml-1 hover:bg-primary/20 rounded-full p-0.5"
+                >
+                  <span className="material-symbols-outlined text-sm">close</span>
+                </button>
+              </span>
+            )}
+            {genderPreference && genderPreference !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
+                <span className="material-symbols-outlined text-sm">wc</span>
+                {getGenderLabel()}
+                <button
+                  onClick={() => setGenderPreference('')}
+                  className="ml-1 hover:bg-primary/20 rounded-full p-0.5"
+                >
+                  <span className="material-symbols-outlined text-sm">close</span>
+                </button>
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop View - Original Filter Bar */}
+      <div className="hidden md:flex mb-6 flex-wrap items-center gap-4 rounded-lg border border-slate-200 bg-background-light p-4">
+        <h3 className="text-lg font-semibold text-slate-800">Filter by:</h3>
+        <div className="flex flex-wrap gap-3 items-center">
         {/* Destination Input with Autocomplete */}
         <div className="relative">
           <div className="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
@@ -306,7 +412,22 @@ function FilterBar({ onFiltersChange }) {
           </button>
         )}
       </div>
-    </div>
+      </div>
+
+      {/* Filter Bottom Sheet - Mobile Only */}
+      <FilterBottomSheet
+        isOpen={isBottomSheetOpen}
+        onClose={() => setIsBottomSheetOpen(false)}
+        onApplyFilters={handleBottomSheetApply}
+        initialFilters={{
+          destination: selectedDestination,
+          destinationName: destinationInput,
+          startDate: dateRange.start,
+          endDate: dateRange.end,
+          genderPreference: genderPreference
+        }}
+      />
+    </>
   );
 }
 

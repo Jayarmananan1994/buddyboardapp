@@ -33,6 +33,44 @@ export const createTrip = async (tripData) => {
   }
 };
 
+export const updateTrip = async (tripId, tripData) => {
+  try {
+    const token = getToken();
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    // Authorization header is required for update
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    } else {
+      throw new Error('Authentication required to update trip');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/trips/${tripId}`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(tripData),
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Unauthorized: Please sign in to update this trip');
+      }
+      if (response.status === 403) {
+        throw new Error('Forbidden: You do not have permission to update this trip');
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error updating trip:', error);
+    throw error;
+  }
+};
+
 export const searchDestinations = async (query, includeCountries) => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/destinations/search?q=${encodeURIComponent(query)}&includeCountries=${includeCountries}`);
@@ -243,6 +281,7 @@ export const deleteTrip = async (tripId) => {
 
 // Wrapped versions with cold start handling for UI components
 export const createTripWithColdStart = createColdStartWrapper(createTrip, 'create trip');
+export const updateTripWithColdStart = createColdStartWrapper(updateTrip, 'update trip');
 export const getTripsWithColdStart = createColdStartWrapper(getTrips, 'fetch trips');
 export const getTripByIdWithColdStart = createColdStartWrapper(getTripById, 'fetch trip details');
 export const searchDestinationsWithColdStart = createColdStartWrapper(searchDestinations, 'search destinations');

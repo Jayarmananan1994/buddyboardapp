@@ -7,6 +7,7 @@ import TripDetailPage from './pages/TripDetailPage';
 import SignInPage from './pages/SignInPage';
 import ResetPinPage from './pages/ResetPinPage';
 import MyTripsPage from './pages/MyTripsPage';
+import EditTripPage from './pages/EditTripPage';
 import { isAuthenticated } from './services/authService';
 import { TripsProvider } from './contexts/TripsContext';
 
@@ -76,6 +77,16 @@ function AppContent() {
           <ProtectedRoute>
             <Layout>
               <MyTripsPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/edit-trip/:id"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <EditTripPage />
             </Layout>
           </ProtectedRoute>
         }

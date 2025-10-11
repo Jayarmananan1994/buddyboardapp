@@ -74,8 +74,8 @@ function MyTripsPage() {
   };
 
   const handleEditTrip = (tripId) => {
-    // Navigate to trip detail page for now (edit functionality to be implemented)
-    navigate(`/trip/${tripId}`, { state: { fromMyTrips: true } });
+    // Navigate to edit trip page
+    navigate(`/edit-trip/${tripId}`);
   };
 
   const handleDeleteTrip = (tripId, tripDestination) => {
@@ -291,20 +291,27 @@ function MyTripsPage() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="mt-4 flex gap-4 border-t border-slate-200 pt-4">
+                <div className="mt-4 flex items-center justify-around border-t border-slate-200 pt-4">
+                  <button
+                    onClick={() => navigate(`/trip/${trip.id}`, { state: { fromMyTrips: true } })}
+                    className="flex flex-col items-center gap-1 px-3 py-2 rounded-lg text-blue-600 hover:bg-blue-50 transition-all"
+                  >
+                    <span className="material-symbols-outlined">visibility</span>
+                    <span className="text-xs font-semibold">View Detail</span>
+                  </button>
                   <button
                     onClick={() => handleEditTrip(trip.id)}
-                    className="flex h-10 items-center justify-center gap-2 rounded bg-primary px-4 text-sm font-bold text-white shadow-sm transition-opacity hover:opacity-80"
+                    className="flex flex-col items-center gap-1 px-3 py-2 rounded-lg text-green-600 hover:bg-green-50 transition-all"
                   >
-                    <span className="material-symbols-outlined text-base">visibility</span>
-                    <span>View</span>
+                    <span className="material-symbols-outlined">edit</span>
+                    <span className="text-xs font-semibold">Edit</span>
                   </button>
                   <button
                     onClick={() => handleDeleteTrip(trip.id, getDestinationName(trip))}
-                    className="flex h-10 items-center justify-center gap-2 rounded bg-slate-100 px-4 text-sm font-bold text-red-600 shadow-sm transition-colors hover:bg-red-50"
+                    className="flex flex-col items-center gap-1 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-all"
                   >
-                    <span className="material-symbols-outlined text-base">delete</span>
-                    <span>Delete</span>
+                    <span className="material-symbols-outlined">delete</span>
+                    <span className="text-xs font-semibold">Delete</span>
                   </button>
                 </div>
               </div>

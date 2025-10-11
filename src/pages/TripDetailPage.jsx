@@ -388,8 +388,7 @@ function TripDetailPage() {
       {/* Toast Notifications */}
       <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
 
-      {/* Floating Feedback Button */}
-      <FloatingFeedbackButton />
+     
     </>
   );
 }

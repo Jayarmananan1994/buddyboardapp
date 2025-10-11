@@ -1,10 +1,14 @@
-import { useState } from 'react';
-import { createTrip } from '../services/tripService';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createTrip, updateTrip } from '../services/tripService';
 import AutocompleteInput from './AutocompleteInput';
 import { useTrips } from '../contexts/TripsContext';
 
-function TripForm() {
+function TripForm({ tripData = null, tripId = null }) {
+  const navigate = useNavigate();
   const { refreshAll } = useTrips();
+  const isEditMode = Boolean(tripId);
+
   const [formData, setFormData] = useState({
     destination: null,
     fromLocation: null,
@@ -19,6 +23,32 @@ function TripForm() {
     contactInfo: '',
     hideContactInfo: false
   });
+
+  // Pre-populate form when in edit mode
+  useEffect(() => {
+    if (tripData && isEditMode) {
+      const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+      setFormData({
+        destination: tripData.destination || null,
+        fromLocation: tripData.from || null,
+        dateType: 'range',
+        startDate: tripData.dateRange?.startDate
+          ? new Date(tripData.dateRange.startDate).toISOString().split('T')[0]
+          : '',
+        endDate: tripData.dateRange?.endDate
+          ? new Date(tripData.dateRange.endDate).toISOString().split('T')[0]
+          : '',
+        month: '',
+        flexibleDates: tripData.isDateFlexible || false,
+        tripDetails: tripData.tripDetail || '',
+        genderPreference: tripData.genderPreference || 'No Preference',
+        contactType: tripData.contactDetail?.medium ? capitalize(tripData.contactDetail.medium) : 'WhatsApp',
+        contactInfo: tripData.contactDetail?.handle || '',
+        hideContactInfo: tripData.contactDetail?.isHidden || false
+      });
+    }
+  }, [tripData, isEditMode]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
@@ -108,34 +138,47 @@ function TripForm() {
         apiData.fromId = formData.fromLocation.id;
       }
 
-      const response = await createTrip(apiData);
+      let response;
+      if (isEditMode) {
+        // Update existing trip
+        response = await updateTrip(tripId, apiData);
+      } else {
+        // Create new trip
+        response = await createTrip(apiData);
+      }
 
       if (response.success) {
-        setCreatedTrip(response.trip);
-        setShowSuccessDialog(true);
-
         // Refresh trips and my trips data
         refreshAll();
 
-        // Reset form
-        setFormData({
-          destination: null,
-          fromLocation: null,
-          dateType: 'range',
-          startDate: '',
-          endDate: '',
-          month: '',
-          flexibleDates: false,
-          tripDetails: '',
-          genderPreference: 'No Preference',
-          contactType: 'WhatsApp',
-          contactInfo: '',
-          hideContactInfo: false
-        });
+        if (isEditMode) {
+          // Navigate back to my trips page after successful update
+          navigate('/my-trips');
+        } else {
+          // Show success dialog for new trip
+          setCreatedTrip(response.trip);
+          setShowSuccessDialog(true);
+
+          // Reset form
+          setFormData({
+            destination: null,
+            fromLocation: null,
+            dateType: 'range',
+            startDate: '',
+            endDate: '',
+            month: '',
+            flexibleDates: false,
+            tripDetails: '',
+            genderPreference: 'No Preference',
+            contactType: 'WhatsApp',
+            contactInfo: '',
+            hideContactInfo: false
+          });
+        }
       }
     } catch (error) {
-      console.error('Error posting trip:', error);
-      alert('Error posting trip. Please try again.');
+      console.error(isEditMode ? 'Error updating trip:' : 'Error posting trip:', error);
+      alert(isEditMode ? 'Error updating trip. Please try again.' : 'Error posting trip. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -417,7 +460,7 @@ function TripForm() {
             disabled={isSubmitting}
             className="w-full sm:w-auto bg-primary text-white font-bold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Posting...' : 'Post Trip'}
+            {isSubmitting ? (isEditMode ? 'Updating...' : 'Posting...') : (isEditMode ? 'Update Trip' : 'Post Trip')}
           </button>
         </div>
       </form>

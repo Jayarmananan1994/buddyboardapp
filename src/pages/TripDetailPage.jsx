@@ -169,30 +169,8 @@ function TripDetailPage() {
     return trip.destination || 'Unknown Destination';
   };
 
-  // Get contact method display
-  const getContactMethod = () => {
-    if (trip.contactDetail && trip.contactDetail.medium) {
-      return trip.contactDetail.medium;
-    }
-    return trip.contact?.type || 'Not specified';
-  };
-
-  // Render contact icon for interested users
-  const renderContactIcon = (contactDetail) => {
-    if (!contactDetail || !contactDetail.medium) return null;
-
-    const { medium, handle } = contactDetail;
-
-    const handleUserContactClick = async () => {
-      await handleContactClick(
-        medium,
-        handle,
-        (message) => showSuccess(message),
-        (message) => showError(message)
-      );
-    };
-
-    const getIconForMedium = (medium) => {
+  // Get icon SVG for contact medium
+  const getIconForMedium = (medium) => {
       switch (medium.toLowerCase()) {
         case 'whatsapp':
           return (
@@ -233,6 +211,21 @@ function TripDetailPage() {
       }
     };
 
+  // Render contact icon for interested users
+  const renderContactIcon = (contactDetail) => {
+    if (!contactDetail || !contactDetail.medium) return null;
+
+    const { medium, handle } = contactDetail;
+
+    const handleUserContactClick = async () => {
+      await handleContactClick(
+        medium,
+        handle,
+        (message) => showSuccess(message),
+        (message) => showError(message)
+      );
+    };
+
     return (
       <button
         onClick={handleUserContactClick}
@@ -270,43 +263,53 @@ function TripDetailPage() {
           >
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
             <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white mb-2">
-                Trip to {getDestinationName()}
-              </h1>
-              <p className="text-slate-100 text-sm md:text-base">
-                {formatDateRange()}
-              </p>
+              <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                <div className="flex-1">
+                  <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white mb-2">
+                    Trip to {getDestinationName()}
+                  </h1>
+                  <p className="text-slate-100 text-sm md:text-base">
+                    {formatDateRange()}
+                  </p>
+                </div>
+                {trip.canShowInterest !== false && !isOwnerView && (
+                  <button
+                    onClick={handleShowInterest}
+                    className="flex-shrink-0 w-full md:w-auto bg-white text-primary font-bold py-3 px-6 rounded-lg hover:bg-white/90 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                  >
+                    I'm Interested
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         ) : (
-          <div className="relative h-64 md:h-80 w-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-            <span className="material-symbols-outlined text-6xl text-primary/30">travel_explore</span>
+          <div className="relative h-64 md:h-80 w-full bg-gradient-to-br from-primary/20 to-primary/5">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="material-symbols-outlined text-6xl text-primary/30">travel_explore</span>
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+              <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                <div className="flex-1">
+                  <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-2">
+                    Trip to {getDestinationName()}
+                  </h1>
+                  <p className="text-slate-600 text-sm md:text-base">
+                    {formatDateRange()}
+                  </p>
+                </div>
+                {trip.canShowInterest !== false && !isOwnerView && (
+                  <button
+                    onClick={handleShowInterest}
+                    className="flex-shrink-0 w-full md:w-auto bg-primary text-white font-bold py-3 px-6 rounded-lg hover:bg-primary/90 transition-all duration-300 transform hover:scale-105"
+                  >
+                    I'm Interested
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         )}
-
-        {/* Header */}
-        <div className="p-6 md:p-8">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-            <div className="flex-1">
-              {!trip.imageUrl && (
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-                  Trip to {getDestinationName()}
-                </h1>
-              )}
-              <p className="mt-2 text-slate-600">
-                {trip.tripDetail || trip.description || 'Join me on an amazing travel adventure!'}
-              </p>
-            </div>
-            {trip.canShowInterest !== false && !isOwnerView && (
-              <button
-                onClick={handleShowInterest}
-                className="flex-shrink-0 w-full md:w-auto bg-primary text-white font-bold py-3 px-6 rounded-lg hover:bg-primary/90 transition-all duration-300 transform hover:scale-105"
-              >
-                I'm Interested
-              </button>
-            )}
-          </div>
-        </div>
 
         {/* Trip Details */}
         <div className="border-t border-slate-200 px-6 md:px-8 py-6">
@@ -330,7 +333,25 @@ function TripDetailPage() {
             </div>
             <div className="flex flex-col">
               <span className="text-sm text-slate-500 mb-1">Contact Via</span>
-              <span className="font-medium text-slate-900 capitalize">{getContactMethod()}</span>
+              {trip.contactDetail && trip.contactDetail.medium ? (
+                <button
+                  onClick={async () => {
+                    await handleContactClick(
+                      trip.contactDetail.medium,
+                      trip.contactDetail.handle,
+                      (message) => showSuccess(message),
+                      (message) => showError(message)
+                    );
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors w-fit"
+                  title={`Contact via ${trip.contactDetail.medium}`}
+                >
+                  {getIconForMedium(trip.contactDetail.medium)}
+                  <span className="font-medium capitalize">{trip.contactDetail.handle}</span>
+                </button>
+              ) : (
+                <span className="font-medium text-slate-900">Not specified</span>
+              )}
             </div>
             <div className="flex flex-col">
               <span className="text-sm text-slate-500 mb-1">Date Flexible</span>
@@ -362,7 +383,7 @@ function TripDetailPage() {
                         {user.name || user.contactInfo?.name || 'Anonymous'}
                       </p>
                       <p className="text-sm text-slate-500">
-                        Interested in traveling with you
+                      {(isOwnerView || trip.isOwner) ? 'Interested in traveling with you' : 'Interested in this trip'}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">

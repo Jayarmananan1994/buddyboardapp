@@ -134,7 +134,10 @@ function TripCard({ trip }) {
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg transition-transform duration-300 hover:scale-105">
+    <div
+      onClick={handleViewDetail}
+      className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg transition-transform duration-300 hover:scale-105 cursor-pointer"
+    >
       {/* Trip Image or Placeholder */}
       {trip.imageUrl ? (
         <div
@@ -210,21 +213,30 @@ function TripCard({ trip }) {
         {/* Action Buttons */}
         <div className="mt-4 flex items-center justify-around border-t border-slate-200 pt-4">
           <button
-            onClick={handleShowInterest}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleShowInterest();
+            }}
             className="flex flex-col items-center gap-1 text-slate-600 hover:text-primary transition-colors"
           >
             <span className="material-symbols-outlined">group_add</span>
             <span className="text-xs font-semibold">I'm Interested</span>
           </button>
           <button
-            onClick={handleViewDetail}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewDetail();
+            }}
             className="flex flex-col items-center gap-1 text-slate-600 hover:text-primary transition-colors"
           >
             <span className="material-symbols-outlined">visibility</span>
             <span className="text-xs font-semibold">View Detail</span>
           </button>
           <button
-            onClick={() => trip.contactDetail && onContactClick(getContactInfo())}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (trip.contactDetail) onContactClick(getContactInfo());
+            }}
             disabled={!trip.contactDetail}
             className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all ${
               trip.contactDetail

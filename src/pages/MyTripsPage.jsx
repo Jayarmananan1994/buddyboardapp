@@ -244,7 +244,8 @@ function MyTripsPage() {
             {myTrips.map((trip) => (
               <div
                 key={trip.id}
-                className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6"
+                onClick={() => navigate(`/trip/${trip.id}`, { state: { fromMyTrips: true } })}
+                className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6 cursor-pointer hover:shadow-md transition-shadow"
               >
                 <div className="flex flex-col-reverse items-start gap-6 sm:flex-row">
                   <div className="flex-1">
@@ -293,21 +294,30 @@ function MyTripsPage() {
                 {/* Action Buttons */}
                 <div className="mt-4 flex items-center justify-around border-t border-slate-200 pt-4">
                   <button
-                    onClick={() => navigate(`/trip/${trip.id}`, { state: { fromMyTrips: true } })}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/trip/${trip.id}`, { state: { fromMyTrips: true } });
+                    }}
                     className="flex flex-col items-center gap-1 px-3 py-2 rounded-lg text-blue-600 hover:bg-blue-50 transition-all"
                   >
                     <span className="material-symbols-outlined">visibility</span>
                     <span className="text-xs font-semibold">View Detail</span>
                   </button>
                   <button
-                    onClick={() => handleEditTrip(trip.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditTrip(trip.id);
+                    }}
                     className="flex flex-col items-center gap-1 px-3 py-2 rounded-lg text-green-600 hover:bg-green-50 transition-all"
                   >
                     <span className="material-symbols-outlined">edit</span>
                     <span className="text-xs font-semibold">Edit</span>
                   </button>
                   <button
-                    onClick={() => handleDeleteTrip(trip.id, getDestinationName(trip))}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteTrip(trip.id, getDestinationName(trip));
+                    }}
                     className="flex flex-col items-center gap-1 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-all"
                   >
                     <span className="material-symbols-outlined">delete</span>

@@ -16,7 +16,8 @@ function TripForm() {
     tripDetails: '',
     genderPreference: 'No Preference',
     contactType: 'WhatsApp',
-    contactInfo: ''
+    contactInfo: '',
+    hideContactInfo: false
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -97,7 +98,8 @@ function TripForm() {
         tripDetail: formData.tripDetails,
         contactDetail: {
           medium: formData.contactType.toLowerCase(),
-          handle: formData.contactInfo
+          handle: formData.contactInfo,
+          isHidden: formData.hideContactInfo
         }
       };
 
@@ -127,7 +129,8 @@ function TripForm() {
           tripDetails: '',
           genderPreference: 'No Preference',
           contactType: 'WhatsApp',
-          contactInfo: ''
+          contactInfo: '',
+          hideContactInfo: false
         });
       }
     } catch (error) {
@@ -356,9 +359,21 @@ function TripForm() {
 
         {/* Contact Information */}
         <div>
-          <label htmlFor="contactType" className="block text-sm font-medium text-gray-700 mb-1">
-            Contact Channel
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label htmlFor="contactType" className="block text-sm font-medium text-gray-700">
+              Contact Channel
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                name="hideContactInfo"
+                checked={formData.hideContactInfo}
+                onChange={handleInputChange}
+                className="w-4 h-4 text-primary bg-background-light border-gray-300 rounded focus:ring-primary focus:ring-2"
+              />
+              <span className="text-sm text-gray-600">Hide contact info</span>
+            </label>
+          </div>
           <div className="flex space-x-2">
             <select
               id="contactType"
@@ -387,6 +402,11 @@ function TripForm() {
           </div>
           {errors.contactInfo && (
             <p className="mt-1 text-sm text-red-600">{errors.contactInfo}</p>
+          )}
+          {formData.hideContactInfo && (
+            <p className="mt-2 text-xs text-gray-500">
+              ℹ️ Your contact info will be hidden. 
+            </p>
           )}
         </div>
 

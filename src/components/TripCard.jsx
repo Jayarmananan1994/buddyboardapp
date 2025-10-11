@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import Button from './Button';
 import { handleContactClick } from '../utils/contactUtils';
 import { useToast } from '../hooks/useToast';
 import ToastContainer from './ToastContainer';
@@ -48,11 +47,6 @@ function TripCard({ trip }) {
     return trip.destination?.name || trip.destination || 'Unknown Destination';
   };
 
-  // Get gender preference display
-  const getGenderPreference = () => {
-    return trip.genderPreference || trip.genderPref || 'No Preference';
-  };
-
   // Get contact information
   const getContactInfo = () => {
     if (trip.contactDetail) {
@@ -65,21 +59,43 @@ function TripCard({ trip }) {
     return trip.contact || { type: 'email', value: 'Contact info', icon: 'email' };
   };
 
-  // Contact styling based on type
-  const getContactStyling = (type) => {
+  // Contact button background color based on type
+  const getContactButtonColor = (type) => {
     switch (type) {
       case 'telegram':
-        return 'bg-blue-100 text-blue-800';
+        return 'hover:bg-blue-50';
       case 'whatsapp':
-        return 'bg-green-100 text-green-800';
+        return 'hover:bg-green-50';
       case 'instagram':
-        return 'bg-pink-100 text-pink-800';
+        return 'hover:bg-pink-50';
       case 'discord':
-        return 'bg-indigo-100 text-indigo-800';
+        return 'hover:bg-indigo-50';
       case 'email':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'hover:bg-yellow-50';
+      case 'phone':
+        return 'hover:bg-blue-50';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'hover:bg-slate-50';
+    }
+  };
+
+  // Contact icon color based on type
+  const getContactIconColor = (type) => {
+    switch (type) {
+      case 'telegram':
+        return 'text-blue-500';
+      case 'whatsapp':
+        return 'text-green-600';
+      case 'instagram':
+        return 'text-pink-600';
+      case 'discord':
+        return 'text-indigo-600';
+      case 'email':
+        return 'text-yellow-600';
+      case 'phone':
+        return 'text-blue-600';
+      default:
+        return 'text-slate-600';
     }
   };
 
@@ -108,8 +124,17 @@ function TripCard({ trip }) {
     }
   };
 
+  // Get creator info
+  const getCreatorName = () => {
+    return trip.createdBy?.username || 'Anonymous';
+  };
+
+  const getCreatorAvatar = () => {
+    return trip.createdBy?.avatarUrl;
+  };
+
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-lg">
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg transition-transform duration-300 hover:scale-105">
       {/* Trip Image or Placeholder */}
       {trip.imageUrl ? (
         <div
@@ -121,70 +146,102 @@ function TripCard({ trip }) {
             e.target.classList.add('bg-slate-200');
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-          <div className="absolute bottom-0 left-0 p-4">
-            <h3 className="text-xl font-bold text-white">{getDestinationName()}</h3>
-            <p className="text-sm text-slate-200">{formatDateRange()}</p>
+          {/* Avatar + Username Overlay */}
+          <div className="absolute top-2 right-2 flex items-center gap-2 rounded-full bg-black/50 p-1 pr-3 text-white">
+            {getCreatorAvatar() ? (
+              <img
+                alt={getCreatorName()}
+                className="h-8 w-8 rounded-full object-cover"
+                src={getCreatorAvatar()}
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            <div className={`h-8 w-8 rounded-full bg-slate-400 flex items-center justify-center ${getCreatorAvatar() ? 'hidden' : ''}`}>
+              <span className="material-symbols-outlined text-white text-base">person</span>
+            </div>
+            <span className="text-sm font-semibold">{getCreatorName()}</span>
           </div>
         </div>
       ) : (
         <div className="relative h-48 w-full bg-slate-200 flex items-center justify-center">
           <span className="material-symbols-outlined text-4xl text-slate-400">travel_explore</span>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-          <div className="absolute bottom-0 left-0 p-4">
-            <h3 className="text-xl font-bold text-white">{getDestinationName()}</h3>
-            <p className="text-sm text-slate-200">{formatDateRange()}</p>
+          {/* Avatar + Username Overlay */}
+          <div className="absolute top-2 right-2 flex items-center gap-2 rounded-full bg-black/50 p-1 pr-3 text-white">
+            {getCreatorAvatar() ? (
+              <img
+                alt={getCreatorName()}
+                className="h-8 w-8 rounded-full object-cover"
+                src={getCreatorAvatar()}
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            <div className={`h-8 w-8 rounded-full bg-slate-400 flex items-center justify-center ${getCreatorAvatar() ? 'hidden' : ''}`}>
+              <span className="material-symbols-outlined text-white text-base">person</span>
+            </div>
+            <span className="text-sm font-semibold">{getCreatorName()}</span>
           </div>
         </div>
       )}
 
       {/* Trip Details */}
-      <div className="p-4">
-        <div className="mb-4 space-y-2 text-sm text-slate-600">
-          {/* Destination */}
-          <p>
-            <span className="font-medium text-slate-800">Destination:</span> {getDestinationName()}
-            {trip.destination?.country && (
-              <span className="text-slate-500">, {trip.destination.country.name}</span>
-            )}
-          </p>
-
-          {trip.from && (
-            <p>
-              <span className="font-medium text-slate-800">Starting From:</span> {trip.from.name}
+      <div className="flex flex-1 flex-col justify-between p-4">
+        <div>
+          <h3 className="text-xl font-bold text-slate-900">{getDestinationName()}</h3>
+          <div className="mt-1 flex items-center gap-3">
+            <p className="text-slate-500">
+              {formatDateRange()}
+              {trip.isDateFlexible && <span> (Flexible)</span>}
             </p>
-          )}
-
-          <p>
-            <span className="font-medium text-slate-800">Gender Pref:</span> {getGenderPreference()}
-          </p>
-
-          {trip.isDateFlexible && (
-            <p className="text-xs text-blue-600 font-medium">📅 Flexible Dates</p>
-          )}
-
-          {/* Contact with styled badge */}
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-slate-800">Contact:</span>
-            <button
-              onClick={() => onContactClick(getContactInfo())}
-              className={`flex items-center gap-1.5 truncate rounded-md px-2 py-1 text-xs font-medium transition-all duration-200 hover:scale-105 hover:shadow-md active:scale-95 cursor-pointer ${getContactStyling(getContactInfo().type)}`}
-              title={`Contact via ${getContactInfo().type}`}
-            >
-              {renderContactIcon(getContactInfo())}
-              <span>{getContactInfo().value}</span>
-            </button>
+            {trip.interestedCount !== undefined && trip.interestedCount > 0 && (
+              <div className="flex items-center gap-1 text-sm text-red-500">
+                <span className="material-symbols-outlined text-base">favorite</span>
+                <span className="font-medium">{trip.interestedCount}</span>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-3">
-          <Button variant="primary" onClick={handleShowInterest}>
-            Show Interest
-          </Button>
-          <Button variant="secondary" onClick={handleViewDetail}>
-            View Detail
-          </Button>
+        <div className="mt-4 flex items-center justify-around border-t border-slate-200 pt-4">
+          <button
+            onClick={handleShowInterest}
+            className="flex flex-col items-center gap-1 text-slate-600 hover:text-primary transition-colors"
+          >
+            <span className="material-symbols-outlined">group_add</span>
+            <span className="text-xs font-semibold">I'm Interested</span>
+          </button>
+          <button
+            onClick={handleViewDetail}
+            className="flex flex-col items-center gap-1 text-slate-600 hover:text-primary transition-colors"
+          >
+            <span className="material-symbols-outlined">visibility</span>
+            <span className="text-xs font-semibold">View Detail</span>
+          </button>
+          <button
+            onClick={() => trip.contactDetail && onContactClick(getContactInfo())}
+            disabled={!trip.contactDetail}
+            className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all ${
+              trip.contactDetail
+                ? `cursor-pointer ${getContactButtonColor(getContactInfo().type)} ${getContactIconColor(getContactInfo().type)}`
+                : 'text-slate-400 cursor-not-allowed'
+            }`}
+            title={trip.contactDetail ? `Contact via ${getContactInfo().type}` : 'Contact info hidden'}
+          >
+            {trip.contactDetail ? (
+              <div className="w-5 h-5 flex items-center justify-center">
+                {renderContactIcon(getContactInfo())}
+              </div>
+            ) : (
+              <span className="material-symbols-outlined">lock</span>
+            )}
+            <span className="text-xs font-semibold">Contact</span>
+          </button>
         </div>
       </div>
 
